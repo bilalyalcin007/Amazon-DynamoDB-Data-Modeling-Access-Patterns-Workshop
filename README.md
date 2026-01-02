@@ -8,108 +8,108 @@ The use case simulates a **forum-style application**, where multiple DynamoDB ta
 ---
 
 ## 🎯 What I Practiced in This Project
-- Designing DynamoDB tables based on access patterns
-- Using **GetItem, Query, and Scan** operations
-- Understanding **Scan vs Query performance and cost**
-- Handling **reserved keywords** in DynamoDB expressions
-- Creating and querying **Global Secondary Indexes (GSIs)**
-- Comparing **RCU consumption** across access patterns
-- Managing data via **AWS CLI and AWS Console**
-- Enabling **Point-in-Time Recovery (PITR)** for data protection
+- Designing DynamoDB tables based on access patterns  
+- Using **GetItem, Query, and Scan** operations  
+- Understanding **Scan vs Query performance and cost**  
+- Handling **reserved keywords** in DynamoDB expressions  
+- Creating and querying **Global Secondary Indexes (GSIs)**  
+- Comparing **RCU consumption** across access patterns  
+- Managing data via **AWS CLI and AWS Console**  
+- Enabling **Point-in-Time Recovery (PITR)** for data protection  
 
 ---
 
 ## 🏗️ Architecture Overview
-The application models a forum system using multiple DynamoDB tables.
-
 ![Architecture Diagram](screenshots/1-architecture.png)
 
 ---
 
 ## 🧩 DynamoDB Tables
-
-| Table Name | Partition Key | Sort Key |
-|-----------|---------------|----------|
-| Forum | Name (S) | — |
-| Thread | ForumName (S) | Subject (S) |
-| Reply | Id (S) | ReplyDateTime (S) |
-
-![DynamoDB Tables](screenshots/tables.png)
+![DynamoDB Tables Created](screenshots/3-resources_created.png)
 
 ---
 
 ## 🔍 Access Patterns & Queries
 
-### 1️⃣ Scan with Filter Expressions
-Scan operations were used to retrieve data based on non-key attributes.  
-This demonstrated how **Scan reads the entire table** and consumes more RCUs.
-
-![Scan with Filter Expression](screenshots/scan-filter.png)
-
----
-
-### 2️⃣ Reserved Keyword Handling
-While filtering data, a **reserved keyword error** was encountered (`Views`).  
-This was resolved using `ExpressionAttributeNames`.
-
-❌ Reserved keyword error:
-![Reserved Keyword Error](screenshots/reserved-keyword-error.png)
-
-✅ Fixed using `ExpressionAttributeNames`:
-![Reserved Keyword Fix](screenshots/reserved-keyword-fix.png)
+### 1️⃣ Reading Items with GetItem
+![GetItem API](screenshots/7-GetItem_API.png)
+![Read Single Item](screenshots/8-read_single_item.png)
+![Consistent vs Eventually Consistent Reads](screenshots/9-consistent_read_and_eventually_read.png)
 
 ---
 
-### 3️⃣ Query vs Scan Comparison
-Query operations were compared with Scan operations to observe:
-- Items returned vs items scanned
-- RCU consumption
-- Query efficiency
+### 2️⃣ Querying Item Collections
+![Query Item Collections](screenshots/10-reading_item_collections_using_query.png)
 
-![Query vs Scan Comparison](screenshots/query-vs-scan.png)
+---
+
+### 3️⃣ Scan Operations with Filter Expressions
+![Scan Forum Table](screenshots/12-scan_forum_table.png)
+![Filter Expressions](screenshots/11-reading_item_using_filter_expressions.png)
+
+---
+
+### 4️⃣ Reserved Keyword Handling
+❌ Reserved keyword error (`Views`)
+![Reserved Word Error](screenshots/13-dynamodb_reserved_word_error.png)
+
+✅ Fixed using `ExpressionAttributeNames`
+![Reserved Word Fixed](screenshots/14-reserved_word_error_fixed.png)
+
+---
+
+### 5️⃣ Insert, Update, and Delete Operations
+![Insert and Update Items](screenshots/15-insert_and_update_items.png)
+![Deleting Data](screenshots/16-deleting_data.png)
 
 ---
 
 ## 🚀 Global Secondary Index (GSI)
 
 ### Why a GSI?
-The original table design did not support querying replies by user efficiently.  
-A **Global Secondary Index (GSI)** was introduced to enable this access pattern without redesigning the table.
+Scan operations were inefficient when querying replies by user.  
+A **Global Secondary Index (GSI)** was created to support a new access pattern without redesigning the base table.
 
-### GSI Configuration
-- **Index Name:** `PostedBy-ReplyDateTime-gsi`
-- **Partition Key:** PostedBy
-- **Sort Key:** ReplyDateTime
-- **Projection Type:** ALL
-
-![Create GSI](screenshots/create-gsi.png)
+![GSI Concept](screenshots/17-global_secondary_indexes.png)
+![GSI Explanation](screenshots/20-GSI_note.png)
 
 ---
 
-### Querying Data Using GSI
-Once the GSI became active, queries were executed efficiently using the new access pattern.
-
-![Query on GSI](screenshots/query-gsi.png)
+### Creating the GSI (CLI & Console)
+![Create GSI (CLI)](screenshots/21-create_gsi.png)
+![Create GSI (Console)](screenshots/30-create_GSI_console.png)
+![GSI Status](screenshots/22-status_of_GSI.png)
 
 ---
 
-## 🔐 Data Protection & Recovery
+### Querying Data Using the GSI
+![Query Reply Table](screenshots/18-query_reply_table_1.png)
+![Query Reply Table (More Results)](screenshots/19-query_reply_table_2.png)
+![Query on GSI](screenshots/23-query_on_GSI.png)
+![Query Result on GSI](screenshots/24-query_scan_result_on_GSI.png)
+
+🚫 **GetItem is not supported on GSIs**
+![GetItem on GSI Error](screenshots/25-getitem_on_GSI.png)
+
+---
+
+## 🔐 Data Protection & Backups
 
 ### Point-in-Time Recovery (PITR)
-To protect against accidental deletes or overwrites:
-- **Point-in-Time Recovery (PITR)** was enabled
-- Recovery window set to **35 days**
+PITR was enabled to protect against accidental deletes or overwrites.
 
-![PITR Enabled](screenshots/pitr-enabled.png)
+![Backup Settings](screenshots/34-backup.png)
+![Backup Settings Updated](screenshots/35-backup_2.png)
+![PITR Enabled](screenshots/36-backup_3.png)
 
 ---
 
 ## 🧠 Key Learnings
-- DynamoDB performance depends heavily on **data model design**
-- **Scan operations are expensive** and should be avoided at scale
-- GSIs enable new access patterns without re-architecting tables
-- Monitoring **RCU usage** is critical for cost control
-- DynamoDB design starts with **access patterns**, not schema
+- DynamoDB design starts with **access patterns**, not schema  
+- **Scan operations are expensive** and should be avoided at scale  
+- GSIs enable efficient querying without table redesign  
+- Reserved keywords must be handled explicitly  
+- Monitoring **RCUs** is critical for cost optimization  
 
 ---
 
@@ -123,5 +123,5 @@ To protect against accidental deletes or overwrites:
 
 ## ✅ Project Status
 ✔ Completed  
-✔ Tested using CLI and Console  
+✔ Tested via AWS CLI and Console  
 ✔ Portfolio-ready
