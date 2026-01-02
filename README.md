@@ -22,7 +22,7 @@ The use case simulates a **forum-style application**, where multiple DynamoDB ta
 ## 🏗️ Architecture Overview
 The application models a forum system using multiple DynamoDB tables.
 
-![Architecture Diagram](screenshots/architecture.png)
+![Architecture Diagram](screenshots/1-architecture.png)
 
 ---
 
